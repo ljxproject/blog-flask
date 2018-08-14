@@ -1,0 +1,49 @@
+{% extends 'common/base.html' %}
+{% from 'macro.html' import show_pagination %}
+
+{% block title %} 微博首页 {% endblock %}
+
+{% block page_content %}
+    <div class="container">
+    {{ wtf.quick_form(form) }}
+    </div>
+
+    {% for post in posts %}
+        <hr>
+        <div class="media">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" src="{{ url_for('static',filename='upload/'+ post.user.icon) }}" alt="头像">
+                </a>
+            </div>
+            <div class="media-body">
+                <h3 class="media-heading">{{ post.user.username }}</h3>
+                <p>{{ moment(post.timestamp).fromNow() }}</p>
+                {{ post.content }}
+                {% if current_user.is_authenticated %}
+                    <div class="collect" url="{{ url_for('users.collect', pid=post.id) }}" style="cursor: pointer">{% if current_user.is_favorite(post.id) %}取消收藏{% else %}收藏{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    {{ show_pagination(pagination, 'main.index') }}
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(function (){
+            $('.collect').click(function () {
+                _this = this
+                $.get($(this).attr('url'),function (){
+                    if ($(_this).text() === '收藏') {
+                        $(_this).text('取消收藏')
+                    } else {
+                        $(_this).text('收藏')
+                    }
+                })
+            })
+        })
+    </script>
+{% endblock %}

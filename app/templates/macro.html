@@ -1,0 +1,32 @@
+{% macro show_pagination(pagination, endpoint) %}
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {#            没有上一页的时候，设置disabled#}
+            <li {% if not pagination.has_prev %}class="disabled"{% endif %}>
+                <a href="{% if pagination.has_prev %}{{ url_for(endpoint,page=pagination.prev_num, **kwargs)}}{% else %}#{% endif %}" aria-label="Previous">
+                <span>
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+                </a>
+            </li>
+            {#        循环显示页码，当当前也等于当前循环的页码数事，把当前页设置为active#}
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                <li {% if page == pagination.page %}class="active"{% endif %}>
+                    <a href="{{ url_for(endpoint, page=page, **kwargs) }}">
+                    <span>{{ page }}<span class="sr-only">(current)</span></span>
+                    </a>
+                </li>
+                {% else %}
+                    <li><a href="#">&hellip;</a></li>
+                {% endif %}
+            {% endfor %}
+            <li {% if not pagination.has_next %}class="disabled"{% endif %}>
+                <a href="{% if pagination.has_next %}{{ url_for(endpoint,page=pagination.next_num) }}{% else %}#{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endmacro %}
